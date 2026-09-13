@@ -539,6 +539,28 @@
     setTimeout(() => { tapHeart.style.transform = 'scale(1)'; }, 180);
   });
   tapHeart.style.transition = 'transform 0.18s ease';
+
+    // ---------- Background music toggle ----------
+  const music = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  music.volume = 0.5;
+ 
+  musicToggle.addEventListener('click', () => {
+    if (music.paused) {
+      music.play().catch(() => {
+        // file not added yet, or browser blocked it
+        musicToggle.title = "Add song.mp3 to the folder first";
+      });
+      musicToggle.classList.add('playing');
+      musicToggle.title = 'Pause music';
+      musicToggle.setAttribute('aria-label', 'Pause background music');
+    } else {
+      music.pause();
+      musicToggle.classList.remove('playing');
+      musicToggle.title = 'Play music';
+      musicToggle.setAttribute('aria-label', 'Play background music');
+    }
+  });
 </script>
 
 </body>

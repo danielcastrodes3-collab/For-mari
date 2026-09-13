@@ -326,6 +326,56 @@
     margin-top: 6px;
   }
 
+  /* ---------- Music toggle ---------- */
+  .music-toggle{
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 1px solid var(--latte);
+    box-shadow: 0 14px 28px -14px rgba(56,67,38,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .music-toggle:hover{
+    transform: scale(1.06);
+  }
+  .music-toggle svg{
+    width: 20px;
+    height: 20px;
+    stroke: var(--matcha-deep);
+  }
+  .music-toggle .bars{
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 16px;
+  }
+  .music-toggle .bars span{
+    display: block;
+    width: 3px;
+    background: var(--matcha-deep);
+    border-radius: 2px;
+    height: 6px;
+  }
+  .music-toggle.playing .bars span{
+    animation: eq 0.9s ease-in-out infinite;
+  }
+  .music-toggle .bars span:nth-child(1){ animation-delay: 0s; }
+  .music-toggle .bars span:nth-child(2){ animation-delay: 0.15s; }
+  .music-toggle .bars span:nth-child(3){ animation-delay: 0.3s; }
+  @keyframes eq{
+    0%, 100%{ height: 6px; }
+    50%{ height: 16px; }
+  }
+
   @media (max-width: 620px){
     .letter{ padding: 40px 26px; }
     .scrapbook{ grid-template-columns: repeat(2, 1fr); }
@@ -406,6 +456,13 @@
   </footer>
 
 </div>
+
+<audio id="bgMusic" loop preload="none">
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+<button class="music-toggle" id="musicToggle" aria-label="Play background music" title="Play music">
+  <div class="bars"><span></span><span></span><span></span></div>
+</button>
 
 <script>
   // Live day counter since Jan 14 (relationship start)
@@ -540,26 +597,36 @@
   });
   tapHeart.style.transition = 'transform 0.18s ease';
 
-    // ---------- Background music toggle ----------
+  // ---------- Background music toggle ----------
   const music = document.getElementById('bgMusic');
   const musicToggle = document.getElementById('musicToggle');
   music.volume = 0.5;
- 
+
   musicToggle.addEventListener('click', () => {
     if (music.paused) {
       music.play().catch(() => {
-        // file not added yet, or browser blocked it
-        musicToggle.title = "Add song.mp3 to the folder first";
+        musicToggle.title = "Couldn't play song.mp3 — check it's a valid MP3 in the same folder as index.html";
+        alert("The music didn't start. Make sure song.mp3 is a real, working MP3 file sitting in the same folder as index.html.");
       });
-      musicToggle.classList.add('playing');
-      musicToggle.title = 'Pause music';
-      musicToggle.setAttribute('aria-label', 'Pause background music');
     } else {
       music.pause();
-      musicToggle.classList.remove('playing');
-      musicToggle.title = 'Play music';
-      musicToggle.setAttribute('aria-label', 'Play background music');
     }
+  });
+
+  // Only reflect "playing" once audio genuinely starts, not just on click
+  music.addEventListener('playing', () => {
+    musicToggle.classList.add('playing');
+    musicToggle.title = 'Pause music';
+    musicToggle.setAttribute('aria-label', 'Pause background music');
+  });
+  music.addEventListener('pause', () => {
+    musicToggle.classList.remove('playing');
+    musicToggle.title = 'Play music';
+    musicToggle.setAttribute('aria-label', 'Play background music');
+  });
+  music.addEventListener('error', () => {
+    musicToggle.classList.remove('playing');
+    musicToggle.title = "song.mp3 not found or unreadable";
   });
 </script>
 
